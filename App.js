@@ -1,21 +1,29 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react"
+import Info from "./info.js";
+import axios from "axios";
+import Loading from "./Loading";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+export default class extends React.Component {
+  state = {
+    isLoading: true
+  };
+  getAntData = async () => {
+    const { data } = await axios.get(
+      "http://antserver.hillasen.com:7060/getData?key=password"
+    );
+    console.log(data);
+    this.setState({ isLoading: false, data : data });
+  };
+  componentDidMount() {
+    this.getAntData()
+  }
+  
+
+  interval = setInterval(() => {
+    this.getAntData()
+  }, 3000);
+  render(){
+    const { isLoading } = this.state;
+    return isLoading ? <Loading /> : <Info data={this.state.data}/>;
+  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
